@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_jwt_auth/pages/auth/login_page.dart';
+import 'package:flutter_jwt_auth/pages/view/login_page.dart';
+import 'package:flutter_jwt_auth/pages/view/register_page.dart';
+import 'package:flutter_jwt_auth/pages/view/home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,11 +13,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      title: 'JWT Auth Tutorial',
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/home': (context) => const HomePage(),
+      },
       home: const LoginPage(),
     );
   }
