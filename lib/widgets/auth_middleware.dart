@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_jwt_auth/pages/auth/login_page.dart';
+import 'package:flutter_jwt_auth/pages/view/login_page.dart';
 
-import '../../services/secure_storage.dart';
-import '../../services/wordpress_auth_methods.dart';
+import '../services/manage_secure_storage.dart';
+import '../services/wordpress_auth_methods.dart';
 
 class AuthMiddleware extends StatefulWidget {
   final Widget child;
