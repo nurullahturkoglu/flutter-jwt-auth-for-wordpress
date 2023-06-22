@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_jwt_auth/models/user_model.dart';
-import 'package:flutter_jwt_auth/services/secure_storage.dart';
+import 'package:flutter_jwt_auth/services/manage_secure_storage.dart';
 
 import 'manage_shared_preferences.dart';
 
@@ -13,49 +13,140 @@ class WordPressAuthMethods {
   final String _wpRegisterPath = 'register';
   final Dio _dio = Dio();
 
-  Future<UserModel> loginToWordPress(String email, String password) async {
+  Future<bool> loginToWordPress(
+      context, String username, String password) async {
     try {
       final response = await _dio.post(
         _baseUrl + _wpApiPath + _wpTokenPath,
         data: {
-          'username': email,
+          'username': username,
           'password': password,
         },
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
-        final wordpressLoginModel = UserModel.fromJson(data);
-        return wordpressLoginModel;
+        String token = response.data['token'];
+        UserModel user = UserModel(
+          token: token,
+          userId: response.data['user_id'],
+          userEmail: response.data['user_email'],
+          userNicename: response.data['user_nicename'],
+          userDisplayName: response.data['user_display_name'],
+          userRole: response.data['user_role'],
+        );
+
+        // Save token to secure storage
+        await SecureStorage.saveToken(token);
+
+        // Save user info to shared preferences
+        await ManageSharedPreferences.saveUser(user);
+
+        // show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login successful'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // return true
+        return true;
       } else {
-        throw Exception('Login failed');
+        // show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        // return false
       }
+      return false;
     } catch (error) {
-      throw Exception('Login error: $error');
+      // show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Username or password is incorrect'),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      // return false
+      return false;
     }
   }
 
-  Future<bool> registerToWordPress(String email, String password) async {
+  Future<bool> registerToWordPress(
+      context, String username, String password) async {
     try {
       final response = await _dio.post(
         _baseUrl + _wpApiPath + _wpRegisterPath,
         data: {
-          'username': email,
+          'username': username,
           'password': password,
         },
       );
 
-      if (response.statusCode == 200) {
+      String message = response.data['message'];
+
+      if (response.statusCode == 200 && response.data['status'] == "success") {
+        // get user id
+        String userId = response.data['user_id'];
+
+        // show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$message $userId'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // return true
         return true;
       } else {
-        throw Exception('Registration failed');
+        // show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed $message'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        // return false
       }
+      return false;
     } catch (error) {
-      throw Exception('Registiration error: $error');
+      // show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Internal Error Occurred $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      // return false
+      return false;
     }
   }
 
   Future<bool> validateUserToken() async {
+    // Valid Token Response
+    // {
+    //   "code": "jwt_auth_valid_token",
+    //   "data": {
+    //       "status": 200,
+    //       "user_id": "9"
+    //   }
+    // }
+
+    // Invalid Token Response
+    // {
+    //   "code": "jwt_auth_invalid_token",
+    //   "message": "Unexpected control character found",
+    //   "data": {
+    //       "status": 403
+    //   }
+    // }
+
     Dio dio = Dio();
 
     // Get token from secure storage
@@ -72,7 +163,7 @@ class WordPressAuthMethods {
       Response response =
           await dio.post(_baseUrl + _wpApiPath + _wpTokenValidatePath);
 
-      if (response.statusCode == 200) {
+      if (response.data['data']['status'] == 200) {
         // Token is valid
         String code = response.data['code'];
         String userId = response.data['data']['user_id'];
@@ -84,7 +175,7 @@ class WordPressAuthMethods {
           debugPrint('Token is invalid');
 
           // if token is invalid, clear token and user info
-          await clearUserToken();
+          await clearUser();
           return false;
         }
       } else {
@@ -97,8 +188,8 @@ class WordPressAuthMethods {
     }
   }
 
-  clearUserToken() async {
+  clearUser() async {
     await SecureStorage.deleteToken();
-    await ManageSharedPreferences.clearUser();
+    await ManageSharedPreferences.clearUserModel();
   }
 }
