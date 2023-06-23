@@ -3,7 +3,7 @@ import 'package:flutter_jwt_auth/constants/fonts.dart';
 import 'package:flutter_jwt_auth/services/wordpress_auth_methods.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -49,40 +49,49 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 25),
-              Image.asset(
-                'assets/images/logo.png',
-                width: 75,
-              ),
-              const SizedBox(height: 15),
-              Text(
-                'Sign in to Scriptyuvasi',
-                style: AppFonts.large(),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.all(25),
-                width: MediaQuery.of(context).size.width * 0.80,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+          child: isLoading
+              ? const CircularProgressIndicator()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 25),
+
+                    // logo
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: 75,
+                    ),
+                    const SizedBox(height: 15),
+
+                    // title
+                    Text(
+                      'Sign in to Scriptyuvasi',
+                      style: AppFonts.large(),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // login form
+                    Container(
+                      padding: const EdgeInsets.all(25),
+                      width: MediaQuery.of(context).size.width * 0.80,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: LoginForm(
+                        formKey: _formKey,
+                        usernameController: _usernameController,
+                        passwordController: _passwordController,
+                        onLoginPressed: handleLogin,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    // create account
+                    CreateAccount(isLoading: isLoading),
+                  ],
                 ),
-                child: LoginForm(
-                  formKey: _formKey,
-                  usernameController: _usernameController,
-                  passwordController: _passwordController,
-                  isLoading: isLoading,
-                  onLoginPressed: handleLogin,
-                ),
-              ),
-              const SizedBox(height: 15),
-              const CreateAccount(),
-            ],
-          ),
         ),
       ),
     );
@@ -91,8 +100,10 @@ class _LoginPageState extends State<LoginPage> {
 
 class CreateAccount extends StatelessWidget {
   const CreateAccount({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+    required this.isLoading,
+  });
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -111,9 +122,11 @@ class CreateAccount extends StatelessWidget {
             style: AppFonts.medium(color: Colors.black),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/register');
-            },
+            onPressed: isLoading
+                ? null
+                : () {
+                    Navigator.of(context).pushNamed('/register');
+                  },
             child: const Text('Create account'),
           ),
         ],
@@ -128,137 +141,133 @@ class LoginForm extends StatelessWidget {
     required this.formKey,
     required this.usernameController,
     required this.passwordController,
-    required this.isLoading,
     required this.onLoginPressed,
   }) : super(key: key);
 
   final GlobalKey<FormState> formKey;
   final TextEditingController usernameController;
   final TextEditingController passwordController;
-  final bool isLoading;
   final VoidCallback onLoginPressed;
 
   @override
   Widget build(BuildContext context) {
-    return !isLoading
-        ? Form(
-            key: formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Form(
+      key: formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Username',
+            style: AppFonts.medium(color: Colors.black87),
+          ),
+          const SizedBox(height: 10),
+
+          // username field
+          TextFormField(
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Please enter your username';
+              }
+              return null;
+            },
+            controller: usernameController,
+            decoration: const InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.blue,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black54,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12),
+                ),
+              ),
+            ),
+            style: AppFonts.small(color: Colors.black87),
+          ),
+          const SizedBox(height: 10),
+
+          // forgot password
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Password',
+                style: AppFonts.medium(color: Colors.black87),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text('Forgot Password?'),
+              ),
+            ],
+          ),
+
+          // password field
+          TextFormField(
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Please enter your password';
+              }
+              return null;
+            },
+            controller: passwordController,
+            obscureText: true,
+            decoration: const InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.blue,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.black54,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12),
+                ),
+              ),
+            ),
+            style: AppFonts.small(color: Colors.black54),
+          ),
+          const SizedBox(height: 15),
+
+          // login button
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.green),
+              shape: MaterialStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ),
+            onPressed: onLoginPressed,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Username',
-                  style: AppFonts.medium(color: Colors.black87),
-                ),
-                const SizedBox(height: 10),
-
-                // username field
-                TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter your username';
-                    }
-                    return null;
-                  },
-                  controller: usernameController,
-                  decoration: const InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(12),
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.black54,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(12),
-                      ),
-                    ),
-                  ),
-                  style: AppFonts.small(color: Colors.black87),
-                ),
-                const SizedBox(height: 10),
-
-                // forgot password
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Password',
-                      style: AppFonts.medium(color: Colors.black87),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('Forgot Password?'),
-                    ),
-                  ],
-                ),
-
-                // password field
-                TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.blue,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(12),
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.black54,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(12),
-                      ),
-                    ),
-                  ),
-                  style: AppFonts.small(color: Colors.black54),
-                ),
-                const SizedBox(height: 15),
-
-                // login button
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.green),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                  ),
-                  onPressed: onLoginPressed,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Sign in',
-                        style: AppFonts.medium(color: Colors.white),
-                      )
-                    ],
-                  ),
-                ),
+                  'Sign in',
+                  style: AppFonts.medium(color: Colors.white),
+                )
               ],
             ),
-          )
-        : const Center(child: CircularProgressIndicator());
+          ),
+        ],
+      ),
+    );
   }
 }

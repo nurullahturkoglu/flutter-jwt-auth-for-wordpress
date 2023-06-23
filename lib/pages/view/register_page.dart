@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jwt_auth/constants/fonts.dart';
 
+import '../../services/wordpress_auth_methods.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
@@ -9,6 +11,38 @@ class RegisterPage extends StatefulWidget {
 }
 
 class RegisterPageState extends State<RegisterPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> handleRegister() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      setState(() {
+        isLoading = true;
+      });
+      bool isLoginSuccessful = await WordPressAuthMethods().registerToWordPress(
+          context, _usernameController.text, _passwordController.text);
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (isLoginSuccessful && mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/login', (Route<dynamic> route) => false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,55 +50,51 @@ class RegisterPageState extends State<RegisterPage> {
       body: Center(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 25),
+          child: isLoading
+              ? const CircularProgressIndicator()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 25),
 
-              // logo
-              Image.asset(
-                'assets/images/logo.png',
-                width: 75,
-              ),
-              const SizedBox(height: 15),
+                    // logo
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: 75,
+                    ),
+                    const SizedBox(height: 15),
 
-              // create an account text
-              Text(
-                'Create an Account',
-                style: AppFonts.large(),
-              ),
-              const SizedBox(height: 10),
+                    // create an account text
+                    Text(
+                      'Create an Account',
+                      style: AppFonts.large(),
+                    ),
+                    const SizedBox(height: 10),
 
-              // register container
-              const RegisterContainer(),
-              const SizedBox(height: 15),
+                    // register container
+                    Container(
+                      padding: const EdgeInsets.all(25),
+                      width: MediaQuery.of(context).size.width * 0.80,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: RegisterForm(
+                        formKey: _formKey,
+                        usernameController: _usernameController,
+                        passwordController: _passwordController,
+                        onRegisterPressed: handleRegister,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
 
-              // don't have an account link
-              const LoginLink(),
-            ],
-          ),
+                    // don't have an account link
+                    const LoginLink(),
+                  ],
+                ),
         ),
       ),
-    );
-  }
-}
-
-class RegisterContainer extends StatelessWidget {
-  const RegisterContainer({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(25),
-      width: MediaQuery.of(context).size.width * 0.80,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: const RegisterForm(),
     );
   }
 }
@@ -102,11 +132,23 @@ class LoginLink extends StatelessWidget {
 }
 
 class RegisterForm extends StatelessWidget {
-  const RegisterForm({Key? key}) : super(key: key);
+  const RegisterForm({
+    super.key,
+    required this.formKey,
+    required this.usernameController,
+    required this.passwordController,
+    required this.onRegisterPressed,
+  });
+
+  final GlobalKey<FormState> formKey;
+  final TextEditingController usernameController;
+  final TextEditingController passwordController;
+  final Future<void> Function() onRegisterPressed;
 
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -115,6 +157,7 @@ class RegisterForm extends StatelessWidget {
 
           // username field
           TextFormField(
+            controller: usernameController,
             decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
@@ -145,6 +188,7 @@ class RegisterForm extends StatelessWidget {
 
           // password field
           TextFormField(
+            controller: passwordController,
             obscureText: true,
             decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
@@ -173,16 +217,14 @@ class RegisterForm extends StatelessWidget {
           // register button
           ElevatedButton(
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.green),
+              backgroundColor: MaterialStateProperty.all(Colors.blue),
               shape: MaterialStateProperty.all(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
               ),
             ),
-            onPressed: () {
-              // Kayıt olma işlemleri burada gerçekleştirilebilir
-            },
+            onPressed: onRegisterPressed,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
