@@ -1,6 +1,6 @@
-# Project Name
+# Flutter JWT Authentication for WordPress App
 
-Project Description
+This Flutter application is designed to facilitate the login process to a Wordpress site using the JWT Authentication API obtained from the [Tmeister/wp-api-jwt-auth repository](https://github.com/Tmeister/wp-api-jwt-auth). The application allows users to register, log in, and access specific pages. It provides a secure and scalable architecture by implementing JWT token-based authentication.
 
 ## Features
 
@@ -14,20 +14,20 @@ Project Description
 
 ## Screenshots
 
-### Login Screen
-![login](https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/08498c3a-b2df-48a6-add3-8c539e5f0c3f)
+<img src="https://github.com/nurullahturkoglu/flutter-jwt-auth-for-wordpress/assets/73299153/7032d687-87c1-4e8b-a34d-675a05e99a9f" alt="login screen" width="300"/>
 
 ### Register Screen
-![register](https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/d0e48906-e54c-4214-9ece-26cee0d8f268)
+<img src="https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/d0e48906-e54c-4214-9ece-26cee0d8f268" alt="register screen" width="300"/>
 
 ### Home Screen
-![home](https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/2c531f23-37d4-47a8-9b37-812e8a28e8fc)
+<img src="https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/2c531f23-37d4-47a8-9b37-812e8a28e8fc" alt="home screen" width="300"/>
 
 ### Profile Screen
-![profile](https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/1ccbe592-8e82-4880-b346-003f0fa8b7a0)
+<img src="https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/1ccbe592-8e82-4880-b346-003f0fa8b7a0" alt="profile screen" width="300"/>
+
 
 ### Book Screen
-![books](https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/a7284d0e-2d9e-4fd5-be94-59613e167d0c)
+<img src="https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/a7284d0e-2d9e-4fd5-be94-59613e167d0c" alt="book screen" width="300"/>
 
 
 ## Getting Started
@@ -45,7 +45,7 @@ Follow the steps below to run the project in your local environment.
 1. Clone the project:
 
    ```bash
-   git clone https://github.com/USERNAME/REPO_NAME.git
+   git clone https://github.com/nurullahturkoglu/flutter-jwt-auth-for-wordpress.git
 
 2. Install the required dependencies:
 
@@ -204,7 +204,7 @@ return MaterialApp(
 The code above uses the `AuthMiddleware` widget to add token validation to different pages. This ensures that token validation is performed before accessing certain pages.
 
 ## Credit
-I am using [TMeister JWT Auth](https://github.com/Tmeister/wp-api-jwt-auth) for token generation and token verification in WordPress.
+Using [TMeister JWT Auth](https://github.com/Tmeister/wp-api-jwt-auth) for token generation and token verification in WordPress.
 
 ## Contributing
 
