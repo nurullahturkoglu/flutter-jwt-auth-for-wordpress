@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_jwt_auth/pages/view/login_page.dart';
-
-import '../services/manage_secure_storage.dart';
 import '../services/wordpress_auth_methods.dart';
 
 class AuthMiddleware extends StatefulWidget {
@@ -23,13 +20,6 @@ class AuthMiddlewareState extends State<AuthMiddleware> {
   }
 
   Future<void> validateToken() async {
-    String? token = await SecureStorage.getToken();
-
-    if (token == null) {
-      navigateToLoginPage();
-      return;
-    }
-
     bool isValid = await WordPressAuthMethods().validateUserToken();
 
     if (!isValid) {
@@ -44,18 +34,19 @@ class AuthMiddlewareState extends State<AuthMiddleware> {
 
   void navigateToLoginPage() {
     // Navigate to login page
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const LoginPage(),
-      ),
-    );
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/login', (Route<dynamic> route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
     if (!isAuthenticated) {
-      // if user is not authenticated, return empty container
-      return Container();
+      // if user is not authenticated, return a circular progress indicator
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return widget.child;

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter_jwt_auth/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -36,7 +34,7 @@ class ManageSharedPreferences {
     return null;
   }
 
-  static Future<void> clearUser() async {
+  static Future<void> clearUserModel() async {
     SharedPreferences prefs = await _prefs;
     await prefs.remove('user');
   }

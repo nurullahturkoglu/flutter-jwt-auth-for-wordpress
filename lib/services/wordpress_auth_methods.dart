@@ -91,12 +91,11 @@ class WordPressAuthMethods {
 
       if (response.statusCode == 200 && response.data['status'] == "success") {
         // get user id
-        String userId = response.data['user_id'];
 
         // show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('$message $userId'),
+            content: Text(message),
             backgroundColor: Colors.green,
           ),
         );
