@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         '/book': (context) => const AuthMiddleware(child: BookPage()),
         '/profile': (context) => const AuthMiddleware(child: ProfilePage()),
       },
-      home: const LoginPage(),
+      home: const AuthMiddleware(child: HomePage()),
     );
   }
 }
