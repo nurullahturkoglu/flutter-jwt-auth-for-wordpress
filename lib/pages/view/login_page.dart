@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jwt_auth/constants/app_routes.dart';
+import 'package:flutter_jwt_auth/constants/app_strings.dart';
 import 'package:flutter_jwt_auth/constants/fonts.dart';
 import 'package:flutter_jwt_auth/services/wordpress_auth_methods.dart';
 
@@ -37,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (isLoginSuccessful && mounted) {
         Navigator.pushNamedAndRemoveUntil(
-            context, '/home', (Route<dynamic> route) => false);
+            context, AppRoutes.home, (Route<dynamic> route) => false);
       }
     }
   }
@@ -45,53 +47,96 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red.shade600,
-      body: Center(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: isLoading
-              ? const CircularProgressIndicator()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 25),
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: isLoading
+                ? const SizedBox(
+                    height: 200,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
 
-                    // logo
-                    Image.asset(
-                      'assets/images/logo.png',
-                      width: 75,
-                    ),
-                    const SizedBox(height: 15),
-
-                    // title
-                    Text(
-                      'Sign in to Scriptyuvasi',
-                      style: AppFonts.large(),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // login form
-                    Container(
-                      padding: const EdgeInsets.all(25),
-                      width: MediaQuery.of(context).size.width * 0.80,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                      // logo
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          width: 75,
+                        ),
                       ),
-                      child: LoginForm(
-                        formKey: _formKey,
-                        usernameController: _usernameController,
-                        passwordController: _passwordController,
-                        onLoginPressed: handleLogin,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
+                      const SizedBox(height: 24),
 
-                    // create account
-                    CreateAccount(isLoading: isLoading),
-                  ],
-                ),
+                      // title
+                      Text(
+                        AppStrings.signInTitle,
+                        style: AppFonts.large(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        AppStrings.welcomeBack,
+                        style: AppFonts.small(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer
+                              .withValues(alpha: 0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // login form
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        width: double.infinity,
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: LoginForm(
+                          formKey: _formKey,
+                          usernameController: _usernameController,
+                          passwordController: _passwordController,
+                          onLoginPressed: handleLogin,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // create account
+                      CreateAccount(isLoading: isLoading),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
@@ -108,26 +153,42 @@ class CreateAccount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 40, right: 40),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Don\'t have an account?',
-            style: AppFonts.medium(color: Colors.black),
+          Flexible(
+            child: Text(
+              AppStrings.dontHaveAccount,
+              style: AppFonts.medium(color: Colors.black87),
+              textAlign: TextAlign.center,
+            ),
           ),
+          const SizedBox(width: 8),
           TextButton(
             onPressed: isLoading
                 ? null
                 : () {
-                    Navigator.of(context).pushNamed('/register');
+                    Navigator.of(context).pushNamed(AppRoutes.register);
                   },
-            child: const Text('Create account'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text(AppStrings.createAccount),
           ),
         ],
       ),
@@ -137,12 +198,12 @@ class CreateAccount extends StatelessWidget {
 
 class LoginForm extends StatelessWidget {
   const LoginForm({
-    Key? key,
+    super.key,
     required this.formKey,
     required this.usernameController,
     required this.passwordController,
     required this.onLoginPressed,
-  }) : super(key: key);
+  });
 
   final GlobalKey<FormState> formKey;
   final TextEditingController usernameController;
@@ -157,7 +218,7 @@ class LoginForm extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Username',
+            AppStrings.username,
             style: AppFonts.medium(color: Colors.black87),
           ),
           const SizedBox(height: 10),
@@ -165,30 +226,47 @@ class LoginForm extends StatelessWidget {
           // username field
           TextFormField(
             validator: (value) {
-              if (value!.isEmpty) {
-                return 'Please enter your username';
+              if (value == null || value.isEmpty) {
+                return AppStrings.pleaseEnterUsername;
               }
               return null;
             },
             controller: usernameController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey.shade50,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                   width: 2,
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.circular(12),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.black54,
+                  color: Colors.grey.shade300,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.error,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.error,
                   width: 2,
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             style: AppFonts.small(color: Colors.black87),
@@ -200,12 +278,19 @@ class LoginForm extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Password',
+                AppStrings.password,
                 style: AppFonts.medium(color: Colors.black87),
               ),
-              TextButton(
-                onPressed: () {},
-                child: const Text('Forgot Password?'),
+              Flexible(
+                child: TextButton(
+                  onPressed: () {},
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text(AppStrings.forgotPassword),
+                ),
               ),
             ],
           ),
@@ -213,57 +298,72 @@ class LoginForm extends StatelessWidget {
           // password field
           TextFormField(
             validator: (value) {
-              if (value!.isEmpty) {
-                return 'Please enter your password';
+              if (value == null || value.isEmpty) {
+                return AppStrings.pleaseEnterPassword;
               }
               return null;
             },
             controller: passwordController,
             obscureText: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey.shade50,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                   width: 2,
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.circular(12),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.black54,
+                  color: Colors.grey.shade300,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.error,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.error,
                   width: 2,
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            style: AppFonts.small(color: Colors.black54),
+            style: AppFonts.small(color: Colors.black87),
           ),
           const SizedBox(height: 15),
 
           // login button
-          ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.green),
-              shape: MaterialStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 2,
               ),
-            ),
-            onPressed: onLoginPressed,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Sign in',
-                  style: AppFonts.medium(color: Colors.white),
-                )
-              ],
+              onPressed: onLoginPressed,
+              child: Text(
+                AppStrings.signIn,
+                style: AppFonts.medium(color: Colors.white),
+              ),
             ),
           ),
         ],
