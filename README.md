@@ -17,23 +17,23 @@ A Flutter application that provides secure JWT-based authentication for WordPres
 
 ### Login Screen
 
-<img src="assets/images/login.png" alt="Login Screen" width="300" height="600"/>
+<img src="assets/login.png" alt="Login Screen" width="300" height="600"/>
 
 ### Register Screen
 
-<img src="assets/images/register.png" alt="Register Screen" width="300" height="600"/>
+<img src="assets/register.png" alt="Register Screen" width="300" height="600"/>
 
 ### Home Screen
 
-<img src="assets/images/home.png" alt="Home Screen" width="300" height="600"/>
+<img src="assets/home.png" alt="Home Screen" width="300" height="600"/>
 
 ### Profile Screen
 
-<img src="assets/images/profile.png" alt="Profile Screen" width="300" height="600"/>
+<img src="assets/profile.png" alt="Profile Screen" width="300" height="600"/>
 
 ### Books Screen
 
-<img src="assets/images/books.png" alt="Books Screen" width="300" height="600"/>
+<img src="assets/books.png" alt="Books Screen" width="300" height="600"/>
 
 ## Getting Started
 
