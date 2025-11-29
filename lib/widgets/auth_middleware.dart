@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jwt_auth/constants/app_routes.dart';
 import '../services/wordpress_auth_methods.dart';
 
 class AuthMiddleware extends StatefulWidget {
@@ -35,7 +36,7 @@ class AuthMiddlewareState extends State<AuthMiddleware> {
   void navigateToLoginPage() {
     // Navigate to login page
     Navigator.pushNamedAndRemoveUntil(
-        context, '/login', (Route<dynamic> route) => false);
+        context, AppRoutes.login, (Route<dynamic> route) => false);
   }
 
   @override
