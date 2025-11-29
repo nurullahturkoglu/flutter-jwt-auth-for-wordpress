@@ -6,7 +6,7 @@ class AppFonts {
   static const double mediumSize = 17.0;
   static const double largeSize = 23.0;
 
-  static TextStyle? small({Color color = Colors.white}) {
+  static TextStyle small({Color color = Colors.white}) {
     return TextStyle(
       fontFamily: fontName,
       fontSize: smallSize,
@@ -14,7 +14,7 @@ class AppFonts {
     );
   }
 
-  static TextStyle? large({Color color = Colors.white}) {
+  static TextStyle large({Color color = Colors.white}) {
     return TextStyle(
       fontFamily: fontName,
       fontSize: largeSize,
@@ -22,7 +22,7 @@ class AppFonts {
     );
   }
 
-  static TextStyle? medium({Color color = Colors.white}) {
+  static TextStyle medium({Color color = Colors.white}) {
     return TextStyle(
       fontFamily: fontName,
       fontSize: mediumSize,

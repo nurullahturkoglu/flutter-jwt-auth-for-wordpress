@@ -1,39 +1,29 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_jwt_auth/constants/api_constants.dart';
+import 'package:flutter_jwt_auth/constants/app_strings.dart';
 import 'package:flutter_jwt_auth/models/user_model.dart';
 import 'package:flutter_jwt_auth/services/manage_secure_storage.dart';
 
 import 'manage_shared_preferences.dart';
 
 class WordPressAuthMethods {
-  final String _baseUrl = 'https://scriptyuvasi.com/';
-  final String _wpApiPath = 'wp-json/jwt-auth/v1/';
-  final String _wpTokenPath = 'token';
-  final String _wpTokenValidatePath = 'token/validate';
-  final String _wpRegisterPath = 'register';
   final Dio _dio = Dio();
 
   Future<bool> loginToWordPress(
-      context, String username, String password) async {
+      BuildContext context, String username, String password) async {
     try {
       final response = await _dio.post(
-        _baseUrl + _wpApiPath + _wpTokenPath,
+        ApiConstants.baseUrl + ApiConstants.wpApiPath + ApiConstants.tokenPath,
         data: {
-          'username': username,
-          'password': password,
+          ApiConstants.requestKeyUsername: username,
+          ApiConstants.requestKeyPassword: password,
         },
       );
 
-      if (response.statusCode == 200) {
-        String token = response.data['token'];
-        UserModel user = UserModel(
-          token: token,
-          userId: response.data['user_id'],
-          userEmail: response.data['user_email'],
-          userNicename: response.data['user_nicename'],
-          userDisplayName: response.data['user_display_name'],
-          userRole: response.data['user_role'],
-        );
+      if (response.statusCode == ApiConstants.statusCodeOk) {
+        String token = response.data[ApiConstants.responseKeyToken];
+        UserModel user = UserModel.fromJson(response.data);
 
         // Save token to secure storage
         await SecureStorage.saveToken(token);
@@ -42,34 +32,40 @@ class WordPressAuthMethods {
         await ManageSharedPreferences.saveUser(user);
 
         // show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login successful'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.loginSuccessful),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
 
         // return true
         return true;
       } else {
         // show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login failed'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(AppStrings.loginFailed),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
         // return false
       }
       return false;
     } catch (error) {
       // show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Username or password is incorrect'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
 
       // return false
       return false;
@@ -77,50 +73,60 @@ class WordPressAuthMethods {
   }
 
   Future<bool> registerToWordPress(
-      context, String username, String password) async {
+      BuildContext context, String username, String password) async {
     try {
       final response = await _dio.post(
-        _baseUrl + _wpApiPath + _wpRegisterPath,
+        ApiConstants.baseUrl +
+            ApiConstants.wpApiPath +
+            ApiConstants.registerPath,
         data: {
-          'username': username,
-          'password': password,
+          ApiConstants.requestKeyUsername: username,
+          ApiConstants.requestKeyPassword: password,
         },
       );
 
-      String message = response.data['message'];
+      String message = response.data[ApiConstants.responseKeyMessage];
 
-      if (response.statusCode == 200 && response.data['status'] == "success") {
+      if (response.statusCode == ApiConstants.statusCodeOk &&
+          response.data[ApiConstants.responseKeyStatus] ==
+              ApiConstants.statusSuccess) {
         // get user id
 
         // show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
 
         // return true
         return true;
       } else {
         // show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login failed $message'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${AppStrings.loginFailed} $message'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
         // return false
       }
       return false;
     } catch (error) {
       // show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Internal Error Occurred $error'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${AppStrings.internalErrorOccurred} $error'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
 
       // return false
       return false;
@@ -151,43 +157,48 @@ class WordPressAuthMethods {
     // Get token from secure storage
     String? token = await SecureStorage.getToken();
     if (token == null) {
-      debugPrint('Token is null');
+      debugPrint(AppStrings.tokenIsNull);
       return false;
     }
 
     // Set token to dio options
-    dio.options.headers['Authorization'] = 'Bearer $token';
+    dio.options.headers[ApiConstants.headerAuthorization] =
+        ApiConstants.bearerPrefix + token;
 
     try {
-      Response response =
-          await dio.post(_baseUrl + _wpApiPath + _wpTokenValidatePath);
+      Response response = await dio.post(ApiConstants.baseUrl +
+          ApiConstants.wpApiPath +
+          ApiConstants.tokenValidatePath);
 
-      if (response.data['data']['status'] == 200) {
+      if (response.data[ApiConstants.responseKeyData]
+              [ApiConstants.responseKeyStatus] ==
+          ApiConstants.statusCodeOk) {
         // Token is valid
-        String code = response.data['code'];
-        String userId = response.data['data']['user_id'];
+        String code = response.data[ApiConstants.responseKeyCode];
+        String userId = response.data[ApiConstants.responseKeyData]
+            [ApiConstants.responseKeyUserId];
 
-        if (code == 'jwt_auth_valid_token') {
-          debugPrint('Token is valid for user $userId');
+        if (code == ApiConstants.codeValidToken) {
+          debugPrint('${AppStrings.tokenIsValid} $userId');
           return true;
         } else {
-          debugPrint('Token is invalid');
+          debugPrint(AppStrings.tokenIsInvalid);
 
           // if token is invalid, clear token and user info
           await clearUser();
           return false;
         }
       } else {
-        debugPrint('Token validation request failed');
+        debugPrint(AppStrings.tokenValidationFailed);
         return false;
       }
     } catch (error) {
-      debugPrint('An error occurred during token validation: $error');
+      debugPrint('${AppStrings.errorDuringTokenValidation}: $error');
       return false;
     }
   }
 
-  clearUser() async {
+  Future<void> clearUser() async {
     await SecureStorage.deleteToken();
     await ManageSharedPreferences.clearUserModel();
   }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jwt_auth/constants/app_routes.dart';
+import 'package:flutter_jwt_auth/constants/app_strings.dart';
 import 'package:flutter_jwt_auth/constants/fonts.dart';
 
 import '../../services/wordpress_auth_methods.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   RegisterPageState createState() => RegisterPageState();
@@ -38,7 +40,7 @@ class RegisterPageState extends State<RegisterPage> {
 
       if (isLoginSuccessful && mounted) {
         Navigator.pushNamedAndRemoveUntil(
-            context, '/login', (Route<dynamic> route) => false);
+            context, AppRoutes.login, (Route<dynamic> route) => false);
       }
     }
   }
@@ -46,53 +48,97 @@ class RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red.shade600,
-      body: Center(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: isLoading
-              ? const CircularProgressIndicator()
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 25),
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: isLoading
+                ? const SizedBox(
+                    height: 200,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 20),
 
-                    // logo
-                    Image.asset(
-                      'assets/images/logo.png',
-                      width: 75,
-                    ),
-                    const SizedBox(height: 15),
-
-                    // create an account text
-                    Text(
-                      'Create an Account',
-                      style: AppFonts.large(),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // register container
-                    Container(
-                      padding: const EdgeInsets.all(25),
-                      width: MediaQuery.of(context).size.width * 0.80,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                      // logo
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          width: 75,
+                        ),
                       ),
-                      child: RegisterForm(
-                        formKey: _formKey,
-                        usernameController: _usernameController,
-                        passwordController: _passwordController,
-                        onRegisterPressed: handleRegister,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
+                      const SizedBox(height: 24),
 
-                    // don't have an account link
-                    const LoginLink(),
-                  ],
-                ),
+                      // create an account text
+                      Text(
+                        AppStrings.createAccountTitle,
+                        style: AppFonts.large(
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        AppStrings.joinUsToday,
+                        style: AppFonts.small(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer
+                              .withValues(alpha: 0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+
+                      // register container
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        width: double.infinity,
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: RegisterForm(
+                          formKey: _formKey,
+                          usernameController: _usernameController,
+                          passwordController: _passwordController,
+                          onRegisterPressed: handleRegister,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // don't have an account link
+                      const LoginLink(),
+                    ],
+                  ),
+          ),
         ),
       ),
     );
@@ -100,30 +146,45 @@ class RegisterPageState extends State<RegisterPage> {
 }
 
 class LoginLink extends StatelessWidget {
-  const LoginLink({Key? key}) : super(key: key);
+  const LoginLink({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 40, right: 40),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Already have an account?',
-            style: AppFonts.medium(color: Colors.black),
+          Flexible(
+            child: Text(
+              AppStrings.alreadyHaveAccount,
+              style: AppFonts.medium(color: Colors.black87),
+              textAlign: TextAlign.center,
+            ),
           ),
+          const SizedBox(width: 8),
           TextButton(
             onPressed: () {
-              // Route to login page
               Navigator.of(context).pop();
             },
-            child: const Text('Login'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text(AppStrings.login),
           ),
         ],
       ),
@@ -152,88 +213,93 @@ class RegisterForm extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Username', style: AppFonts.medium(color: Colors.black87)),
+          Text(AppStrings.username,
+              style: AppFonts.medium(color: Colors.black87)),
           const SizedBox(height: 10),
 
           // username field
           TextFormField(
             controller: usernameController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey.shade50,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                   width: 2,
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.circular(12),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.black54,
-                  width: 2,
+                  color: Colors.grey.shade300,
+                  width: 1.5,
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             style: AppFonts.small(color: Colors.black87),
           ),
-          const SizedBox(height: 10),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
 
-          Text('Password', style: AppFonts.medium(color: Colors.black87)),
+          Text(AppStrings.password,
+              style: AppFonts.medium(color: Colors.black87)),
           const SizedBox(height: 10),
 
           // password field
           TextFormField(
             controller: passwordController,
             obscureText: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey.shade50,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.blue,
+                  color: Theme.of(context).colorScheme.primary,
                   width: 2,
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.circular(12),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.black54,
-                  width: 2,
+                  color: Colors.grey.shade300,
+                  width: 1.5,
                 ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-            style: AppFonts.small(color: Colors.black54),
+            style: AppFonts.small(color: Colors.black87),
           ),
           const SizedBox(height: 15),
 
           // register button
-          ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.blue),
-              shape: MaterialStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 2,
               ),
-            ),
-            onPressed: onRegisterPressed,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Create Account',
-                  style: AppFonts.medium(color: Colors.white),
-                ),
-              ],
+              onPressed: onRegisterPressed,
+              child: Text(
+                AppStrings.createAccountButton,
+                style: AppFonts.medium(color: Colors.white),
+              ),
             ),
           ),
         ],

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jwt_auth/constants/app_strings.dart';
 
 class BookPage extends StatefulWidget {
-  const BookPage({Key? key}) : super(key: key);
+  const BookPage({super.key});
 
   @override
   State<BookPage> createState() => _BookPageState();
@@ -48,33 +49,82 @@ class _BookPageState extends State<BookPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       appBar: AppBar(
-        title: const Text('Books'),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        title: const Text(AppStrings.books),
       ),
-      body: SingleChildScrollView(
+      body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: searchController,
                 onChanged: (value) {
                   filterBooks(value);
                 },
-                decoration: const InputDecoration(
-                  labelText: 'Search Books',
+                decoration: InputDecoration(
+                  labelText: AppStrings.searchBooks,
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: filteredBooks.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(filteredBooks[index]),
-                );
-              },
+            Expanded(
+              child: filteredBooks.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            AppStrings.noBooksFound,
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: filteredBooks.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                              child: Icon(
+                                Icons.book,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                              ),
+                            ),
+                            title: Text(filteredBooks[index]),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

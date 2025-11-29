@@ -1,109 +1,165 @@
-# Flutter JWT Authentication for WordPress App
+# Flutter JWT Authentication for WordPress
 
-This Flutter application is designed to facilitate the login process to a Wordpress site using the JWT Authentication API obtained from the [Tmeister/wp-api-jwt-auth repository](https://github.com/Tmeister/wp-api-jwt-auth). The application allows users to register, log in, and access specific pages. It provides a secure and scalable architecture by implementing JWT token-based authentication.
+A Flutter application that provides secure JWT-based authentication for WordPress sites. Built with modern Flutter practices and Material Design 3, this app enables users to register, log in, and access protected content through token-based authentication.
 
 ## Features
 
-- JWT Authentication app with Flutter
-- WordPress login using WordPress API service
-- Token generation and validation for authenticated users
-- Token-based authentication for protected pages
-- Integration with WordPress API for user registration and login
-- Data storage using `shared_preferences`
-- Secure storage of tokens using `secure_storage`
+- JWT token-based authentication
+- Modern Material Design 3 UI
+- Secure token storage using `flutter_secure_storage`
+- User data persistence with `shared_preferences`
+- Protected routes with authentication middleware
+- User registration and login functionality
+- User profile management
+- Automatic token validation and refresh
 
 ## Screenshots
 
-<img src="https://github.com/nurullahturkoglu/flutter-jwt-auth-for-wordpress/assets/73299153/7032d687-87c1-4e8b-a34d-675a05e99a9f" alt="login screen" width="300"/>
+### Login Screen
+
+<img src="assets/images/login.png" alt="Login Screen" width="300" height="600"/>
 
 ### Register Screen
-<img src="https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/d0e48906-e54c-4214-9ece-26cee0d8f268" alt="register screen" width="300"/>
+
+<img src="assets/images/register.png" alt="Register Screen" width="300" height="600"/>
 
 ### Home Screen
-<img src="https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/2c531f23-37d4-47a8-9b37-812e8a28e8fc" alt="home screen" width="300"/>
+
+<img src="assets/images/home.png" alt="Home Screen" width="300" height="600"/>
 
 ### Profile Screen
-<img src="https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/1ccbe592-8e82-4880-b346-003f0fa8b7a0" alt="profile screen" width="300"/>
 
+<img src="assets/images/profile.png" alt="Profile Screen" width="300" height="600"/>
 
-### Book Screen
-<img src="https://github.com/nurullahturkoglu/react-chat-app/assets/73299153/a7284d0e-2d9e-4fd5-be94-59613e167d0c" alt="book screen" width="300"/>
+### Books Screen
 
+<img src="assets/images/books.png" alt="Books Screen" width="300" height="600"/>
 
 ## Getting Started
 
-Follow the steps below to run the project in your local environment.
+### Prerequisites
 
-### Requirements
-
-- Flutter SDK
-- Dependencies
-<!-- Add the necessary dependencies and installation steps to run the project -->
+- Flutter SDK (3.0.2 or higher)
+- Dart SDK (3.0.2 or higher)
+- Android Studio / Xcode (for mobile development)
+- A WordPress site with JWT Authentication plugin installed
 
 ### Installation
 
-1. Clone the project:
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/nurullahturkoglu/flutter-jwt-auth-for-wordpress.git
+   cd flutter-jwt-auth-for-wordpress
+   ```
 
-2. Install the required dependencies:
+2. Install dependencies:
 
-    ```bash
-    flutter pub get
-    
-3. Run the application
+   ```bash
+   flutter pub get
+   ```
 
-    ```bash
-    flutter run
-    
+3. Configure your WordPress API endpoint:
+
+   Update the base URL in `lib/services/wordpress_auth_methods.dart`:
+
+   ```dart
+   static const String baseUrl = 'https://your-wordpress-site.com/';
+   ```
+
+4. Run the application:
+
+   ```bash
+   flutter run
+   ```
+
+## Project Structure
+
+```
+lib/
+├── constants/
+│   ├── app_routes.dart      # Route definitions
+│   ├── app_strings.dart     # String constants
+│   ├── api_constants.dart   # API endpoints and keys
+│   ├── storage_keys.dart   # Storage key constants
+│   └── fonts.dart          # Typography styles
+├── models/
+│   └── user_model.dart     # User data model
+├── pages/
+│   └── view/
+│       ├── login_page.dart
+│       ├── register_page.dart
+│       ├── home_page.dart
+│       ├── profile_page.dart
+│       └── books_page.dart
+├── services/
+│   ├── wordpress_auth_methods.dart
+│   ├── manage_secure_storage.dart
+│   └── manage_shared_preferences.dart
+└── widgets/
+    └── auth_middleware.dart
+```
+
 ## Usage
 
-Below, you will find important files and details regarding their usage within the project.
+### Authentication Middleware
 
-### Auth Middleware
+The `auth_middleware.dart` widget wraps protected pages and automatically validates user tokens. If validation fails, users are redirected to the login page.
 
-The `auth_middleware.dart` file is used to enable token validation for pages. If a user doesn't have a token, their token has expired, or an invalid token is provided, they will be automatically redirected to the login page.
 ```dart
-Future<void> validateToken() async {
-    bool isValid = await WordPressAuthMethods().validateUserToken();
-
-    if (!isValid) {
-      navigateToLoginPage();
-      return;
-    }
-
-    setState(() {
-      isAuthenticated = isValid;
-    });
-}
-```
-### WordPress Auth Methods
-
-The `wordpress_auth_methods.dart` file handles WordPress login, registration, and validation processes. User information is stored using `shared_preferences`, while the token is securely stored using `secure_storage`. If a token is not available or has expired, the user will be automatically redirected to the login page.
-
-#### Wordpress Login Function
-**NOTE:** ⚠️ I have made some modifications to the `jwt-authentication-for-wp-rest-api/public/class-jwt-auth-public.php` file in the Tmeister/wp-api-jwt-auth repository. Below, you will find the code snippets added to the `generate_token` section:
-
-```php
-'user_id'         => $user->data->ID,
-'user_role'       => $user->roles[0],
+AuthMiddleware(
+  child: HomePage(),
+)
 ```
 
-By doing so, you can get response if you login successfuly like that:
+### WordPress Authentication
+
+The app integrates with WordPress using the JWT Authentication plugin. User credentials are sent to your WordPress site, and upon successful authentication, a JWT token is returned and securely stored.
+
+#### Login Response
+
+After successful login, you'll receive a response like this:
+
 ```json
 {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.***",
-    "user_id": "13",
-    "user_email": "nurullahturkoglu@gmail.com",
-    "user_nicename": "Nurullah Turkoglu",
-    "user_display_name": "turkoglu1",
-    "user_role": "subscriber"
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+  "user_id": "13",
+  "user_email": "user@example.com",
+  "user_nicename": "username",
+  "user_display_name": "Display Name",
+  "user_role": "subscriber"
 }
 ```
 
+#### Token Validation
 
-> In the `validate_token` function, I have added the following code to retrieve the user ID more efficiently:
+The app validates tokens before accessing protected routes. A valid token response looks like:
+
+```json
+{
+  "code": "jwt_auth_valid_token",
+  "data": {
+    "status": 200,
+    "user_id": "13"
+  }
+}
+```
+
+### WordPress Plugin Configuration
+
+⚠️ **Important**: This app requires modifications to the JWT Authentication plugin. You'll need to edit the `jwt-authentication-for-wp-rest-api/public/class-jwt-auth-public.php` file from the [Tmeister/wp-api-jwt-auth](https://github.com/Tmeister/wp-api-jwt-auth) repository.
+
+Add the following code snippets to the `generate_token` function:
+
+```php
+'user_id'   => $user->data->ID,
+'user_role' => $user->roles[0],
+```
+
+With these modifications, you'll receive a complete response after successful login that includes user ID and role information.
+
+For token validation, add the following to the `validate_token` function:
+
 ```php
 'data' => [
     'status' => 200,
@@ -111,20 +167,11 @@ By doing so, you can get response if you login successfuly like that:
 ],
 ```
 
+This modification allows the app to efficiently retrieve the user ID during token validation.
 
-if token is valid, you can get response like that:
-```json
-{
-    "code": "jwt_auth_valid_token",
-    "data": {
-        "status": 200,
-        "user_id": "13"
-    }
-}
-```
+### User Registration
 
-### Wordpress Register Function
-I have added a register function as an API separate from the Tmeister/wp-api-jwt-auth repository. This register function allows you to perform user registration in WordPress. If you want to activate the registration process, you should add the following code to the `add_api_routes()` function in the `api/public/class-jwt-auth-public.php` file of the plugin:
+To enable user registration, add this route to your WordPress plugin:
 
 ```php
 register_rest_route($this->namespace, '/register', array(
@@ -133,91 +180,70 @@ register_rest_route($this->namespace, '/register', array(
     'permission_callback' => '__return_true',
 ));
 ```
-Additionally, you need to create the `phpcreate_user()` function:
+
+And implement the `create_user` function:
+
 ```php
 function create_user($request) {
     $params = $request->get_params();
-
-    // Get the username and password
     $username = sanitize_text_field($params['username']);
     $password = sanitize_text_field($params['password']);
 
-    // Check if a user with the same username already exists
     $existing_user = get_user_by('login', $username);
     if ($existing_user) {
-        // A user with the same username already exists
-        $response = array(
+        return array(
             'status'  => 'error',
             'message' => 'The username is already taken.',
         );
-    } else {
-        // Create a new user
-        $user_id = wp_create_user($username, $password);
-
-        if (!is_wp_error($user_id)) {
-            // Successful registration
-            $response = array(
-                'status'  => 'success',
-                'message' => 'User created successfully.',
-                'user_id' => $user_id,
-            );
-        } else {
-            // Error occurred
-            $error = $user_id->get_error_message();
-            $response = array(
-                'status'  => 'error',
-                'message' => "Failed to create user. $error",
-            );
-        }
     }
 
-    // Return the response
-    return $response;
+    $user_id = wp_create_user($username, $password);
+
+    if (!is_wp_error($user_id)) {
+        return array(
+            'status'  => 'success',
+            'message' => 'User created successfully.',
+            'user_id' => $user_id,
+        );
+    }
+
+    return array(
+        'status'  => 'error',
+        'message' => 'Failed to create user.',
+    );
 }
 ```
-By doing so, you can create a new membership by making a POST request to the address `https://yourdomain.com/wp-json/jwt-auth/v1/register` with the following JSON payload:
-```json
-{
-    "username": "test123",
-    "password": "123"
-}
-```
 
+## Architecture
 
-### Main Code
+The application follows a clean architecture pattern with separation of concerns:
 
-The main file of the project contains the following code:
+- **Constants**: Centralized configuration and string management
+- **Models**: Data structures for API responses
+- **Services**: Business logic and API communication
+- **Pages**: UI components and user interactions
+- **Widgets**: Reusable UI components
 
-```dart
-return MaterialApp(
-  title: 'JWT Auth Tutorial',
-  routes: {
-    '/login': (context) => const LoginPage(),
-    '/register': (context) => const RegisterPage(),
-    '/home': (context) => const AuthMiddleware(child: HomePage()),
-    '/book': (context) => const AuthMiddleware(child: BookPage()),
-    '/profile': (context) => const AuthMiddleware(child: ProfilePage()),
-  },
-  home: const LoginPage(),
-);
-```
-The code above uses the `AuthMiddleware` widget to add token validation to different pages. This ensures that token validation is performed before accessing certain pages.
+## Dependencies
 
-## Credit
-Using [TMeister JWT Auth](https://github.com/Tmeister/wp-api-jwt-auth) for token generation and token verification in WordPress.
+- `dio`: HTTP client for API requests
+- `flutter_secure_storage`: Secure token storage
+- `shared_preferences`: User data persistence
 
 ## Contributing
 
-We welcome contributions to this project! If you would like to contribute, please follow these steps:
+Contributions are welcome! Please feel free to submit a Pull Request. When contributing:
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Make your changes and commit them.
-4. Push your changes to your forked repository.
-5. Submit a pull request describing your changes.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-Please ensure that your contributions adhere to the coding conventions and guidelines of this project.
+## Credits
+
+This project uses [TMeister JWT Auth](https://github.com/Tmeister/wp-api-jwt-auth) for WordPress JWT token generation and verification.
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). See the [LICENSE](/path/to/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

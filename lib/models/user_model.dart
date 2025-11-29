@@ -6,7 +6,7 @@ String userModelToJson(UserModel data) => json.encode(data.toJson());
 
 class UserModel {
   String? token;
-  String? userId;
+  int? userId;
   String? userEmail;
   String? userNicename;
   String? userDisplayName;
@@ -23,7 +23,9 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         token: json["token"],
-        userId: json["user_id"],
+        userId: json["user_id"] is String
+            ? int.parse(json["user_id"])
+            : json["user_id"],
         userEmail: json["user_email"],
         userNicename: json["user_nicename"],
         userDisplayName: json["user_display_name"],
